@@ -51,8 +51,6 @@ services:
       # Make Traefik use this domain in HTTP
       - traefik.http.routers.traefik-dashboard-http.entrypoints=http
       - traefik.http.routers.traefik-dashboard-http.rule=Host(`${TRAEFIK_SERVER_NAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
-      # Use the traefik-public network (declared below)
-      - traefik.docker.network=public
       # traefik-https the actual router using HTTPS
       - traefik.http.routers.traefik-dashboard-https.entrypoints=https
       - traefik.http.routers.traefik-dashboard-https.rule=Host(`${TRAEFIK_SERVER_NAME}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
