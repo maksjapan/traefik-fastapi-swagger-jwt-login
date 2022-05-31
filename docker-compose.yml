@@ -1,8 +1,7 @@
 # docker-compose.yml
 
-secrets:
-  linode_dns_token:
-    file: ./secrets/linode_dns_token.secret
+networks:
+  api:
 
 services:
 
@@ -33,11 +32,8 @@ services:
       - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
 
-    secrets:
-      - "linode_dns_token"
-
     environment:
-      - "LINODE_TOKEN_FILE=/run/secrets/linode_dns_token"  # this directory is in the docker container with traefik
+      - "LINODE_TOKEN=${LINODE_DNS_TOKEN}"
 
     ports:
       - "80:80"      # host_port : container_port -- the host_port cannot be below 1024 on MacOS.
@@ -71,7 +67,7 @@ services:
       - traefik.http.routers.traefik-dashboard-https.middlewares=admin-auth
 
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/var/run/docker.sock:/var/run/docker.sock"  # this is needed for traefik to work with Docker
       - "./letsencrypt:/letsencrypt"  # store the let's encrypt data on a bind mount volume
     
     networks:
@@ -95,8 +91,8 @@ services:
       # Make Traefik use this domain in HTTP
       - traefik.http.routers.api-http.entrypoints=http
       - traefik.http.routers.api-http.rule=Host(`${API_SERVER_NAME}`)
-      # Use the traefik-public network (declared below)
-      - traefik.docker.network=api
+      # Use the traefik-public network (declared below) - this may not be neccessary.
+      # - traefik.docker.network=api
       # Make Traefik use this domain in HTTPS
       - traefik.http.routers.api-https.entrypoints=https
       - traefik.http.routers.api-https.rule=Host(`${API_SERVER_NAME}`)
@@ -112,5 +108,4 @@ services:
     networks:
       - api
 
-networks:
-  api:
+
